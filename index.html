@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DTMF Tools</title>
+    <title>Tools</title>
 </head>
 <style>
     *{
@@ -20,19 +20,61 @@
     }
     .mainpanel{
         width: 630px;
-        height: 600px;
-        background: #7b7c83;
-        overflow: scroll;
+        height: 500px;
+        overflow: hidden;
+        border: 1px solid black;
+        border-radius: 5px;
     }
     .mainpanel input[type='text']{
         width: 70px;
     }
 
-    .bt{
-        height: 2em;
-        width: 4em;
+    .sendlist{
+        position: absolute;
+        border: 1px solid black;
+        height: 100%;
+        right: 0px;
+        top: 0px;
+        width: 166px;
         background-color: #0fdd6c;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+
+    .senditem{
+        width: 100%;
+        height: 26px;
+        background-color: #28d4ff;
+        border-bottom: 1px solid #000;
+    }
+    .senditem input[type='text']{
+        width: 60%;
+        height: 20px;
+        background-color: transparent;
+        border: 1px 1px 1px 1px solid #000;
+        border-radius: 4px;
         
+    }
+    .senditem input[type='button']{
+        width: 30px;
+        height: 20px;
+        background-color: #28d4ff;
+        border-radius: 4px;
+    }
+    .senditem input[type='checkbox']{
+        vertical-align: middle;
+        width: 15px;
+        height: 15px;
+    }
+
+    .sendcfg{
+
+    }
+
+    .bt{
+        border: 1px solid black;
+        border-radius: 5px;
     }
     .btn{
         display: inline-block;
@@ -63,51 +105,74 @@
 </style>
 <body>
     <div class="panel">
-    <div class="mainpanel">
-        <textarea name="recvtext" id="recvtextvalue" cols="80" rows="25"></textarea>
-        <div style="position: absolute;">
-            <button class="btn btn-info" style="right: -581px;position: relative;bottom: 35px;" onclick="recvtextvalue.value=null">🗑</button>
-            <button class="btn btn-info" style="right: -532px;position: relative;bottom: 0px;" onclick="sendtextvalue.value=null">🗑</button>
-            <button class="btn btn-info" style="right: -484px;position: relative;bottom: -30px;padding: 3px 11px;" onclick="sendtextvalue.value=null">⭐</button>
-        </div>
-        <textarea name="sendtext" id="sendtextvalue" cols="80" rows="5"></textarea>
-        <button class="btn btn-info" style="right:-515px;position: relative;bottom: -5px;" onclick="sendBytes(sendtextvalue.value)">发送</button>
-        <div>
+        <div class="mainpanel">
+            <div style="overflow: scroll; width: 650px;height: 550px;">
 
-        
-        <input type="text" name="port" id="portselect"/>
-        <span>波特率</span>
-        <select id="bpsselect">
-            <option>300</option>
-            <option>600</option>
-            <option>1200</option>
-            <option>2400</option>
-            <option>4800</option>
-            <option>9600</option>
-            <option>14400</option>
-            <option>19200</option>
-            <option>38400</option>
-            <option>57600</option>
-            <option selected>115200</option>
-            <option>128000</option>
-            <option>230400</option>
-            <option>256000</option>
-            <option>460800</option>
-            <option>921600</option>
-            <option>1500000</option>
-            <option>2000000</option>
-        </select>
-        
 
-        <input type="button" value="打开串口" class="btn btn-info" onclick="portOpen(portselect,this,bpsselect.selectedOptions[0].value)"/>
-        
-        </div>
-        <div class="sendlist">
+                <textarea name="recvtext" id="recvtextvalue" cols="80" rows="25"></textarea>
+                <div style="position: absolute;">
+                    <button class="btn btn-info" style="right: -581px;position: relative;bottom: 35px;"
+                        onclick="recvtextvalue.value=null">🗑</button>
+                    <button class="btn btn-info" style="right: -532px;position: relative;bottom: 0px;"
+                        onclick="sendtextvalue.value=null">🗑</button>
+                    <button class="btn btn-info"
+                        style="right: -484px;position: relative;bottom: -30px;padding: 3px 11px;"
+                        onclick="sendtextvalue.value=null">⭐</button>
+                </div>
+                <textarea name="sendtext" id="sendtextvalue" cols="80" rows="5"></textarea>
+                <button class="btn btn-info" style="right:-515px;position: relative;bottom: -5px;"
+                    onclick="sendBytes(sendtextvalue.value)">发送</button>
+                <br>
+                <br>
+                <br>
+            </div>
 
+            <div class="sendlist">
+                <div style="border-bottom: 1px solid black;">
+                    <span>自定义发送</span>
+                    <button class="bt btn-info" style="position: absolute;right: 2px;top: 1px;width: 20px;" onclick="newedit()">🔖</button>
+                </div>
+                <div id="sendlistitem" style="overflow-y: scroll; height: 92%; width: 100%;background-color: #1c8eaa; border-bottom: 1px solid black;">
+                    <!-- <div class="senditem">
+                        <input type="checkbox" name="cb1" id="cb1">
+                        <input type="text" name="ct1" id="ct1">
+                        <input type="button" name="cbt1" id="cbt1" value="100" onclick="sendBytes(ct1.value)">
+                    </div> -->
+                </div>
+                <div class="sendcfg">
+                </div>
+            </div>
+            <div style="position: absolute;left: 10px;bottom: 15px;width: 600px;height: 50px;">
+                <span>串口ID</span>
+                <input type="text" name="port" id="portselect"/><br>
+                <span>波特率</span>
+                <select id="bpsselect">
+                    <option>300</option>
+                    <option>600</option>
+                    <option>1200</option>
+                    <option>2400</option>
+                    <option>4800</option>
+                    <option>9600</option>
+                    <option>14400</option>
+                    <option>19200</option>
+                    <option>38400</option>
+                    <option>57600</option>
+                    <option selected>115200</option>
+                    <option>128000</option>
+                    <option>230400</option>
+                    <option>256000</option>
+                    <option>460800</option>
+                    <option>921600</option>
+                    <option>1500000</option>
+                    <option>2000000</option>
+                </select>
+                <input type="button" value="打开串口" class="btn btn-info" onclick="portOpen(portselect,this,bpsselect.selectedOptions[0].value,recvtextvalue)"/>
+                <br><br>
+                </div>
         </div>
-    </div>
-    <canvas width="480" height="320" id="wavecanvas"></canvas>
-    <img src="" style="width: 480px;height: 320px;" id="waveimg"/>
+
+        <canvas width="480" height="320" id="wavecanvas"></canvas>
+        <img src="" style="width: 480px;height: 320px;" id="waveimg" />
     </div>
 </body>
 <script>
@@ -556,18 +621,29 @@ initsty();
 		// Allow the serial port to be closed later.
 		//writer.releaseLock();
     }
-
+    var editcount=1;
+    var editlist=document.getElementById("sendlistitem");
+    newedit=()=>{
+        let e=document.createElement('div');
+        e.classList.add('senditem');
+        e.innerHTML=`<input type="checkbox" name="cb${editcount}" id="cb${editcount}">
+                        <input type="text" name="ct${editcount}" id="ct${editcount}">
+                        <input type="button" name="cbt${editcount}" id="cbt${editcount}" value="${editcount}" onclick="sendBytes(ct${editcount}.value)">`;
+        editlist.appendChild(e);
+        editcount+=1;
+    }
     onload=()=>{
         let p=DragDiv.create(document.querySelector(".panel"),"串口助手","800px","600px").children[1]
         //let code=addedit(p).children[0].children[1];
         let mp=document.querySelector(".mainpanel")
         mp.parentNode.removeChild(mp);
         p.appendChild(mp);
-        addplay(p,function(p,b){
-            setTimeout(() => {
-                b();
-            }, 300);            
-        });
+
+        // addplay(p,function(p,b){
+        //     setTimeout(() => {
+        //         b();
+        //     }, 300);            
+        // });
         
         let wavepanel=DragDiv.create(document.querySelector(".panel"),"波形","480px","400px").children[1]
         let canvas = document.createElement('canvas');
