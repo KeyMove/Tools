@@ -36,7 +36,6 @@
         right: 0px;
         top: 0px;
         width: 166px;
-        background-color: #0fdd6c;
         text-align: center;
         vertical-align: middle;
     }
@@ -45,7 +44,6 @@
     .senditem{
         width: 100%;
         height: 26px;
-        background-color: #28d4ff;
         border-bottom: 1px solid #000;
     }
     .senditem input[type='text']{
@@ -59,7 +57,7 @@
     .senditem input[type='button']{
         width: 30px;
         height: 20px;
-        background-color: #28d4ff;
+        color: #000;
         border-radius: 4px;
     }
     .senditem input[type='checkbox']{
@@ -101,6 +99,54 @@
     button{
         cursor: pointer;
     }
+
+
+
+
+
+
+    .switch{
+        position: relative;
+        display: inline-block;
+        width: 2.2em;
+        height: 1.2em;
+        left: 35px;
+        top: 1px;
+        position:absolute;
+    }
+    .switch input{
+        display: none;
+    }
+
+
+    .switch input:checked + .roundswitch:before{
+        transform: translateX(1em);
+    }
+    .switch input:checked + .roundswitch{
+        background-color: #2196F3;
+    }
+    .roundswitch{
+        position: absolute;
+        cursor: pointer;
+        border-radius: 1em;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+    }
+    .roundswitch:before {
+        position: absolute;
+        content: "";
+        border-radius: 50%;
+        height: 1em;
+        width: 1em;
+        left: 0.1em;
+        bottom: 0.1em;
+        background-color: white;
+        transition: .4s;
+    }
     
 </style>
 <body>
@@ -117,7 +163,7 @@
                         onclick="sendtextvalue.value=null">🗑</button>
                     <button class="btn btn-info"
                         style="right: -484px;position: relative;bottom: -30px;padding: 3px 11px;"
-                        onclick="sendtextvalue.value=null">⭐</button>
+                        onclick="newedit(sendtextvalue.value)">⭐</button>
                 </div>
                 <textarea name="sendtext" id="sendtextvalue" cols="80" rows="5"></textarea>
                 <button class="btn btn-info" style="right:-515px;position: relative;bottom: -5px;"
@@ -132,7 +178,7 @@
                     <span>自定义发送</span>
                     <button class="bt btn-info" style="position: absolute;right: 2px;top: 1px;width: 20px;" onclick="newedit()">🔖</button>
                 </div>
-                <div id="sendlistitem" style="overflow-y: scroll; height: 92%; width: 100%;background-color: #1c8eaa; border-bottom: 1px solid black;">
+                <div id="sendlistitem" style="overflow-y: scroll; height: 92%; width: 100%; border-bottom: 1px solid black;">
                     <!-- <div class="senditem">
                         <input type="checkbox" name="cb1" id="cb1">
                         <input type="text" name="ct1" id="ct1">
@@ -140,6 +186,20 @@
                     </div> -->
                 </div>
                 <div class="sendcfg">
+                    <div style="position: absolute;left: 2px;">
+                        CRC
+                        <label>
+                            <div class="switch">
+                                <input type="checkbox" />
+                                <div class="roundswitch"></div>
+                            </div>
+                        </label>
+                        <select id="cfgselect" style="position: relative; right: -40px;top: -1px;">
+                            <option selected>自定义配置1</option>
+                            <option>自定义配置2</option>
+                        </select>
+                    </div>
+
                 </div>
             </div>
             <div style="position: absolute;left: 10px;bottom: 15px;width: 600px;height: 50px;">
@@ -300,12 +360,15 @@
         return {
             create: function(div,name,w,h) {
                 name=name?name:"";
-                w=w?w:'200px';
-                h=h?h:'200px';
+                w=w?w:200;
+                h=h?h:200;
                 let val=document.createElement("div");
                 val.className="container";
-                val.style.width=w;
-                val.style.height=h;
+                const { left, top, width, height } = div.getBoundingClientRect();
+                val.style.left=((width-w)/2)+'px';
+                val.style.top=((height-h)/2)+'px';
+                val.style.width=w+'px';
+                val.style.height=h+'px';
                 //val.style.contain=name;
                 val.innerHTML=`
                 <div class="dragbar"></div>
@@ -316,7 +379,9 @@
                 dragitem.onpointerdown = e => {
                     dragitem.classList.add("active")
                     let mdiv=dragitem.parentNode;
-                    mdiv.parentNode.appendChild(mdiv);
+                    if(mdiv.parentNode.lastChild!=mdiv)
+                        mdiv.parentNode.appendChild(mdiv);
+                    
                     const { left, top, width, height } = item.getBoundingClientRect();
                     if (DragList.indexOf(item) == -1)
                         DragList.length = 0;
@@ -623,17 +688,26 @@ initsty();
     }
     var editcount=1;
     var editlist=document.getElementById("sendlistitem");
-    newedit=()=>{
+    newedit=(text)=>{
         let e=document.createElement('div');
         e.classList.add('senditem');
+        text=text?text:"";
         e.innerHTML=`<input type="checkbox" name="cb${editcount}" id="cb${editcount}">
-                        <input type="text" name="ct${editcount}" id="ct${editcount}">
+                        <input type="text" name="ct${editcount}" id="ct${editcount}" value="${text}">
                         <input type="button" name="cbt${editcount}" id="cbt${editcount}" value="${editcount}" onclick="sendBytes(ct${editcount}.value)">`;
         editlist.appendChild(e);
+        
         editcount+=1;
     }
     onload=()=>{
-        let p=DragDiv.create(document.querySelector(".panel"),"串口助手","800px","600px").children[1]
+        let wavepanel=DragDiv.create(document.querySelector(".panel"),"波形",480,360).children[1]
+        let canvas = document.createElement('canvas');
+        canvas.width=480;
+        canvas.height=320;
+        wavepanel.appendChild(canvas);
+
+
+        let p=DragDiv.create(document.querySelector(".panel"),"串口助手",800,600).children[1]
         //let code=addedit(p).children[0].children[1];
         let mp=document.querySelector(".mainpanel")
         mp.parentNode.removeChild(mp);
@@ -645,11 +719,7 @@ initsty();
         //     }, 300);            
         // });
         
-        let wavepanel=DragDiv.create(document.querySelector(".panel"),"波形","480px","400px").children[1]
-        let canvas = document.createElement('canvas');
-        canvas.width=480;
-        canvas.height=320;
-        wavepanel.appendChild(canvas);
+        
 
         if(navigator==null||navigator.serial==null){
             //alert("不支持Web Serial");
